@@ -4,7 +4,7 @@ import { Sidebar, Navbar } from "@/components/ui/layout";
 import { Card, Button } from "@/components/ui/core";
 import { mockTimeLogs } from "@/lib/mock-data";
 import { AgentStatusManager } from "@/components/agent/AgentStatusManager";
-import { Clock, Filter, Download, Calendar as CalendarIcon } from "lucide-react";
+import { Clock, Filter, Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function TimeLogsPage() {
