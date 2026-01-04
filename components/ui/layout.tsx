@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
     LayoutDashboard,
     Clock,
@@ -13,6 +13,8 @@ import {
     LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { authClient } from "@/lib/auth-client";
+import { useState } from "react";
 
 const agentNavItems = [
     { name: "Dashboard", href: "/agent/dashboard", icon: LayoutDashboard },
@@ -31,7 +33,25 @@ const managerNavItems = [
 
 export function Sidebar({ role = "agent" }: { role?: "agent" | "manager" }) {
     const pathname = usePathname();
+    const router = useRouter();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     const items = role === "agent" ? agentNavItems : managerNavItems;
+
+    const handleLogout = async () => {
+        try {
+            setIsLoggingOut(true);
+            await authClient.signOut({
+                fetchOptions: {
+                    onSuccess: () => {
+                        router.push("/auth/login");
+                    },
+                },
+            });
+        } catch (error) {
+            console.error("Logout failed:", error);
+            setIsLoggingOut(false);
+        }
+    };
 
     return (
         <aside className="w-64 h-screen glass border-r border-card-border flex flex-col fixed left-0 top-0 z-50">
@@ -70,9 +90,13 @@ export function Sidebar({ role = "agent" }: { role?: "agent" | "manager" }) {
             </nav>
 
             <div className="p-4 mt-auto border-t border-card-border">
-                <button className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-secondary hover:text-negative hover:bg-negative/10 transition-all duration-200 group">
+                <button 
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-secondary hover:text-negative hover:bg-negative/10 transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                     <LogOut className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                    <span className="font-medium">Sign Out</span>
+                    <span className="font-medium">{isLoggingOut ? "Signing Out..." : "Sign Out"}</span>
                 </button>
             </div>
         </aside>

@@ -13,9 +13,13 @@ interface StatusTimerProps {
 
 export function StatusTimer({ currentStatus, startTime, durationMinutes = 60 }: StatusTimerProps) {
     const [elapsed, setElapsed] = useState("00:00:00");
+    const [startTimeFormatted, setStartTimeFormatted] = useState("");
     const [isWarning, setIsWarning] = useState(false);
 
     useEffect(() => {
+        // Format the start time on client side only to avoid hydration mismatch
+        setStartTimeFormatted(startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+
         const interval = setInterval(() => {
             const now = new Date();
             const diff = now.getTime() - startTime.getTime();
@@ -62,7 +66,7 @@ export function StatusTimer({ currentStatus, startTime, durationMinutes = 60 }: 
                             {currentStatus}
                         </h3>
                         <span className="inline-block mt-1 text-xs font-medium text-secondary px-2 py-0.5 rounded-full bg-background border border-card-border">
-                            Since {startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                            {startTimeFormatted ? `Since ${startTimeFormatted}` : "Loading..."}
                         </span>
                     </div>
                 </div>
