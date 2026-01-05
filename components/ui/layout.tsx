@@ -10,11 +10,13 @@ import {
     Users,
     Map as MapIcon,
     AlertCircle,
-    LogOut
+    LogOut,
+    Menu
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
+import { useSidebarToggle } from "@/lib/hooks/useSidebarToggle";
 
 const agentNavItems = [
     { name: "Dashboard", href: "/agent/dashboard", icon: LayoutDashboard },
@@ -35,6 +37,7 @@ export function Sidebar({ role = "agent" }: { role?: "agent" | "manager" }) {
     const pathname = usePathname();
     const router = useRouter();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const { isOpen, close } = useSidebarToggle();
     const items = role === "agent" ? agentNavItems : managerNavItems;
 
     const handleLogout = async () => {
@@ -54,7 +57,10 @@ export function Sidebar({ role = "agent" }: { role?: "agent" | "manager" }) {
     };
 
     return (
-        <aside className="w-64 h-screen glass border-r border-card-border flex flex-col fixed left-0 top-0 z-50">
+        <aside className={cn(
+            "w-64 h-[calc(100vh-80px)] glass border-r border-card-border flex flex-col fixed left-0 top-20 z-40 transition-transform duration-300 ease-in-out",
+            !isOpen && "-translate-x-full"
+        )}>
             <div className="p-8">
                 <h1 className="text-2xl font-bold neon-text text-primary tracking-tighter">
                     OMNISHIFT
@@ -104,9 +110,20 @@ export function Sidebar({ role = "agent" }: { role?: "agent" | "manager" }) {
 }
 
 export function Navbar({ title }: { title: string }) {
+    const { toggle } = useSidebarToggle();
+    
     return (
-        <header className="h-20 glass border-b border-card-border flex items-center justify-between px-8 sticky top-0 z-40 ml-64">
-            <h2 className="text-xl font-semibold text-foreground">{title}</h2>
+        <header className="h-20 glass border-b border-card-border flex items-center justify-between px-8 fixed top-0 left-0 right-0 z-40">
+            <div className="flex items-center gap-4">
+                <button
+                    onClick={toggle}
+                    className="p-2 rounded-lg hover:bg-secondary/10 transition-colors"
+                    aria-label="Toggle sidebar"
+                >
+                    <Menu className="w-5 h-5 text-foreground" />
+                </button>
+                <h2 className="text-xl font-semibold text-foreground">{title}</h2>
+            </div>
 
             <div className="flex items-center gap-6">
                 <div className="flex flex-col items-end">
